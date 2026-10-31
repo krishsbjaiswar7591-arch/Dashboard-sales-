@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sales Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef1f8;--card:#fff;--ink:#14213d;--mut:#6b7691;--line:#dde3f0;--a:#f5a524;--b:#0f9d8a;--c:#e4572e;--d:#5b6cff;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1428;--card:#171f3a;--ink:#eaf0ff;--mut:#93a0c4;--line:#27315a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e1428;--card:#171f3a;--ink:#eaf0ff;--mut:#93a0c4;--line:#27315a;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(900px 420px at 85% -80px,#f5a52433,transparent),radial-gradient(700px 400px at -10% 10%,#5b6cff26,transparent),var(--bg);background-attachment:fixed;color:var(--ink);font-family:'Bricolage Grotesque',system-ui,sans-serif;line-height:1.45}
+.wrap{max-width:1180px;margin:0 auto;padding:20px 16px 40px}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:20px}
+h1{font-size:clamp(26px,4vw,38px);margin:0;font-weight:800;letter-spacing:-.02em}
+h1 small{display:block;font-size:14px;font-weight:400;color:var(--mut);letter-spacing:0;margin-top:2px}
+.ctl{display:flex;gap:8px;align-items:center}
+.seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px}
+.seg button,.th{font:inherit;border:0;background:none;color:var(--mut);padding:7px 16px;border-radius:999px;cursor:pointer;font-weight:600}
+.seg button.on{background:var(--ink);color:var(--bg)}
+.th{background:var(--card);border:1px solid var(--line);padding:7px 12px}
+button:focus-visible{outline:2px solid var(--d);outline-offset:2px}
+.grid{display:grid;gap:14px}
+.kpis{grid-template-columns:repeat(auto-fit,minmax(210px,1fr));margin-bottom:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:20px;box-shadow:0 8px 24px -14px #14213d40;transition:transform .2s,box-shadow .2s}.card:hover{transform:translateY(-3px);box-shadow:0 16px 30px -14px #14213d55}
+.kpi .l{color:var(--mut);font-size:14px}
+.kpi .v{font-size:36px;font-weight:800;letter-spacing:-.02em;margin:4px 0}
+.kpi .d{font-size:13px;font-weight:600}
+.up{color:var(--b)}.dn{color:var(--c)}
+.hero{border-radius:26px;background:linear-gradient(135deg,#14213d,#3b3fa8 70%,#7a5bff);color:#fff;position:relative;overflow:hidden;border:0}.hero:before{content:'';position:absolute;right:-50px;top:-50px;width:170px;height:170px;border-radius:50%;background:var(--a);opacity:.9}.hero>*{position:relative}
+.hero .l{color:inherit;opacity:.8}.ic{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:18px;margin-bottom:10px}.hero .ic{background:#ffffff26}
+.hero .d{color:var(--a)}
+.main{grid-template-columns:2fr 1fr;margin-bottom:14px}
+.row2{grid-template-columns:1fr 1fr}
+h2{font-size:18px;margin:0 0 14px;font-weight:800;letter-spacing:-.01em}
+svg{width:100%;height:auto;display:block;overflow:visible}
+.ax{fill:var(--mut);font-size:11px}
+.bar{display:flex;align-items:center;gap:10px;margin:10px 0;font-size:14px}
+.bar b{width:84px;font-weight:600}
+.bar i{flex:1;height:10px;background:var(--line);border-radius:9px;overflow:hidden}
+.bar i u{display:block;height:100%;border-radius:9px;transition:width .6s}
+.bar span{width:62px;text-align:right;color:var(--mut)}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:420px}
+th{text-align:left;color:var(--mut);font-weight:400;padding:6px 8px;border-bottom:1px solid var(--line)}
+td{padding:10px 8px;border-bottom:1px solid var(--line)}
+tr:last-child td{border:0}
+.pill{padding:3px 10px;border-radius:99px;font-size:12px;font-weight:600}
+.s1{background:#0f9d8a22;color:var(--b)}.s2{background:#f5a52430;color:#b87300}.s3{background:#e4572e22;color:var(--c)}
+@media (prefers-color-scheme:dark){.s2{color:var(--a)}}
+@media(max-width:820px){.main,.row2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>Sales Dashboard 👋<small id="sub"></small></h1>
+  <div class="ctl">
+    <div class="seg" id="seg"></div>
+    <button class="th" id="th" aria-label="Toggle theme">◐</button>
+  </div>
+</header>
+
+<section class="grid kpis" id="kpis"></section>
+
+<section class="grid main">
+  <div class="card"><h2>Revenue over time</h2><div id="line"></div></div>
+  <div class="card"><h2>Sales by category</h2><div id="cats"></div><h2 style="margin-top:22px">By region</h2><div id="regs"></div></div>
+</section>
+
+<section class="grid row2">
+  <div class="card"><h2>Top products</h2><div class="tw"><table id="prod"></table></div></div>
+  <div class="card"><h2>Recent orders</h2><div class="tw"><table id="ord"></table></div></div>
+</section>
+</div>
+
+<script>
+const R={'7D':{n:7,lab:'Last 7 days',m:1},'30D':{n:30,lab:'Last 30 days',m:4.2},'12M':{n:12,lab:'Last 12 months',m:30}};
+let cur='30D';
+const inr=n=>'₹'+(n>=1e7?(n/1e7).toFixed(2)+' Cr':n>=1e5?(n/1e5).toFixed(2)+' L':Math.round(n).toLocaleString('en-IN'));
+function rng(s){return()=>(s=(s*16807)%2147483647)/2147483647}
+const $=id=>document.getElementById(id);
+const cats=[['Electronics',.34,'var(--d)'],['Fashion',.26,'var(--a)'],['Home & Kitchen',.2,'var(--b)'],['Beauty',.12,'var(--c)'],['Grocery',.08,'var(--mut)']];
+const regs=[['West',.32],['South',.28],['North',.26],['East',.14]];
+const prods=[['Wireless Earbuds Pro',1240,2499],['Cotton Kurta Set',980,1299],['Air Fryer 4L',760,5499],['Vitamin C Serum',910,699],['Smart Watch S2',540,3999]];
+const names=['Aarav Mehta','Priya Nair','Rohan Desai','Sneha Kulkarni','Imran Shaikh','Kavya Reddy'];
+const items=['Earbuds Pro','Kurta Set','Air Fryer','Smart Watch','Serum'];
+function build(){
+  const c=R[cur],r=rng(cur.length*977+c.n);
+  const pts=Array.from({length:c.n},(_,i)=>Math.round((60000+r()*40000+i*(cur==='12M'?9000:900))*c.m));
+  const tot=pts.reduce((a,b)=>a+b,0),ord=Math.round(tot/1850),avg=tot/ord;
+  const g=[12.4+r()*6,8.1+r()*5,-2.3+r()*4,5.2+r()*6].map(x=>+x.toFixed(1));
+  $('sub').textContent=c.lab+' · all channels';
+  const k=[['Total revenue',inr(tot),g[0],'💰','#f5a52433'],['Orders',ord.toLocaleString('en-IN'),g[1],'🛍️','#0f9d8a2e'],['Avg. order value',inr(avg),g[2],'🧾','#e4572e2e'],['Repeat customers',(34+r()*8).toFixed(1)+'%',g[3],'🔁','#5b6cff2e']];
+  $('kpis').innerHTML=k.map((x,i)=>`<div class="card kpi ${i?'':'hero'}"><div class="ic" style="background:${x[4]}">${x[3]}</div><div class="l">${x[0]}</div><div class="v">${x[1]}</div><div class="d ${x[2]>=0?'up':'dn'}">${x[2]>=0?'▲':'▼'} ${Math.abs(x[2])}% vs previous</div></div>`).join('');
+  line(pts);
+  $('cats').innerHTML=cats.map(x=>bar(x[0],x[1]*100,inr(tot*x[1]),x[2])).join('');
+  $('regs').innerHTML=regs.map((x,i)=>bar(x[0],x[1]*100,inr(tot*x[1]),['var(--d)','var(--a)','var(--b)','var(--c)'][i])).join('');
+  $('prod').innerHTML='<tr><th>Product</th><th>Units</th><th>Revenue</th></tr>'+prods.map(p=>{const u=Math.round(p[1]*c.m*(.9+r()*.2)/4);return`<tr><td>${p[0]}</td><td>${u.toLocaleString('en-IN')}</td><td>${inr(u*p[2])}</td></tr>`}).join('');
+  const st=[['Delivered','s1'],['Shipped','s2'],['Pending','s3']];
+  $('ord').innerHTML='<tr><th>Customer</th><th>Item</th><th>Amount</th><th>Status</th></tr>'+names.map((n,i)=>{const s=st[Math.floor(r()*3)];return`<tr><td><span style="display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;margin-right:10px;font-size:12px;font-weight:600;color:#14213d;background:${['#f5a524','#7ee0cf','#ffb3a0','#b4bcff','#ffd98a'][i%5]}">${n.split(' ').map(w=>w[0]).join('')}</span>${n}</td><td>${items[i%5]}</td><td>${inr(500+r()*6000)}</td><td><span class="pill ${s[1]}">${s[0]}</span></td></tr>`}).join('');
+}
+function bar(n,p,v,col){return`<div class="bar"><b>${n}</b><i><u style="width:${p}%;background:${col}"></u></i><span>${v}</span></div>`}
+function line(p){
+  const W=640,H=260,P=34,mx=Math.max(...p)*1.1,x=i=>P+i*(W-P-8)/(p.length-1),y=v=>H-24-(v/mx)*(H-44);
+  const d=p.map((v,i)=>(i?'L':'M')+x(i).toFixed(1)+','+y(v).toFixed(1)).join('');
+  let g='';for(let i=0;i<=4;i++){const yy=H-24-i*(H-44)/4;g+=`<line x1="${P}" x2="${W}" y1="${yy}" y2="${yy}" stroke="var(--line)"/><text class="ax" x="0" y="${yy+4}">${inr(mx*i/4).replace(/\.\d+/,'')}</text>`}
+  const lab=cur==='12M'?['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']:cur==='7D'?['Mon','Tue','Wed','Thu','Fri','Sat','Sun']:null;
+  let xl='';p.forEach((_,i)=>{if(lab||i%5===0)xl+=`<text class="ax" x="${x(i)}" y="${H-4}" text-anchor="middle">${lab?lab[i]:i+1}</text>`});
+  $('line').innerHTML=`<svg viewBox="0 0 ${W} ${H}"><defs><linearGradient id="gr" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="var(--a)" stop-opacity=".45"/><stop offset="1" stop-color="var(--a)" stop-opacity="0"/></linearGradient></defs>${g}${xl}<path d="${d}L${x(p.length-1)},${H-24}L${P},${H-24}Z" fill="url(#gr)"/><path d="${d}" fill="none" stroke="var(--a)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><g id="hv"></g>${p.map((v,i)=>`<circle cx="${x(i)}" cy="${y(v)}" r="14" fill="transparent" onmouseover="tip(${x(i)},${y(v)},'${inr(v)}')" ontouchstart="tip(${x(i)},${y(v)},'${inr(v)}')"/>`).join('')}</svg>`;
+}
+function tip(x,y,t){const w=t.length*8+16;document.getElementById('hv').innerHTML=`<circle cx="${x}" cy="${y}" r="5" fill="var(--a)" stroke="var(--card)" stroke-width="2"/><rect x="${Math.min(x-w/2,640-w)}" y="${y-36}" width="${w}" height="24" rx="8" fill="var(--ink)"/><text x="${Math.min(x,640-w/2)}" y="${y-20}" text-anchor="middle" font-size="12" font-weight="600" fill="var(--bg)">${t}</text>`}
+$('seg').innerHTML=Object.keys(R).map(k=>`<button class="${k===cur?'on':''}">${k}</button>`).join('');
+$('seg').onclick=e=>{if(e.target.tagName!=='BUTTON')return;cur=e.target.textContent;[...$('seg').children].forEach(b=>b.classList.toggle('on',b===e.target));build()};
+$('th').onclick=()=>{const r=document.documentElement,d=r.dataset.theme==='dark'||(!r.dataset.theme&&matchMedia('(prefers-color-scheme:dark)').matches);r.dataset.theme=d?'light':'dark'};
+build();
+</script>
+</body>
+</html>
